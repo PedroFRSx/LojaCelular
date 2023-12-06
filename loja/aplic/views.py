@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from aplic.models import Celular, Cliente, User
+from django.shortcuts import render, get_object_or_404
 
 class IndexView(TemplateView):
     template_name = 'index.html'
@@ -13,8 +14,6 @@ class IndexView(TemplateView):
         context['celular'] = Celular.objects.all()
         return context
 
-class DetalhesView(TemplateView):
-    template_name = 'detalhes.html'
 
 class ContatoView(TemplateView):
     template_name = 'contato.html'
@@ -44,7 +43,7 @@ def cadastro (request):
         cliente = Cliente.objects.create(nome=nome, cpf=cpf, user=user)
         cliente.save()
 
-        return HttpResponse("Cadastrado")
+        return redirect("127.0.0.1:8000")
 
 
 def cliente_login(request):
@@ -58,6 +57,16 @@ def cliente_login(request):
 
         if cliente is not None:         
             login(request, cliente)
-            return redirect('/index')
+            return redirect('http://127.0.0.1:8000')
     
     return render(request, 'login.html')
+
+def detalhes_celular(request, celular_id):
+    celular = get_object_or_404(Celular, pk=celular_id)
+    return render(request, 'detalhes_celular.html', {'celular': celular})
+
+def celular(request):
+    search_term = request.GET.get('search', '')
+    print(f"Termo de pesquisa: {search_term}")
+    Celular = Celular.objects.filter(nome__icontains=search_term)
+    return render(request, 'index', {'celular': celular, 'search_term': search_term})
