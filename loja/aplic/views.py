@@ -1,7 +1,7 @@
 from typing import Any
 from django.http import HttpResponse
 from django.views.generic import TemplateView
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from aplic.models import Celular, Cliente, User
 from django.shortcuts import render, get_object_or_404
@@ -43,7 +43,7 @@ def cadastro (request):
         cliente = Cliente.objects.create(nome=nome, cpf=cpf, user=user)
         cliente.save()
 
-        return redirect("127.0.0.1:8000")
+        return redirect("login")
 
 
 def cliente_login(request):
@@ -61,6 +61,11 @@ def cliente_login(request):
     
     return render(request, 'login.html')
 
+def logout_view(request):
+    logout(request)
+    return redirect('index')
+
+
 def detalhes_celular(request, celular_id):
     celular = get_object_or_404(Celular, pk=celular_id)
     return render(request, 'detalhes_celular.html', {'celular': celular})
@@ -68,5 +73,5 @@ def detalhes_celular(request, celular_id):
 def celular(request):
     search_term = request.GET.get('search', '')
     print(f"Termo de pesquisa: {search_term}")
-    Celular = Celular.objects.filter(nome__icontains=search_term)
-    return render(request, 'index', {'celular': celular, 'search_term': search_term})
+    celular = Celular.objects.filter(nome__icontains=search_term)
+    return render(request, 'index.html', {'celular': celular, 'search_term': search_term})
