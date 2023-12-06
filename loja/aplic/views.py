@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from aplic.models import Celular, Cliente, User
 from django.shortcuts import render, get_object_or_404
 
+
 class IndexView(TemplateView):
     template_name = 'index.html'
 
@@ -73,5 +74,8 @@ def detalhes_celular(request, celular_id):
 def celular(request):
     search_term = request.GET.get('search', '')
     print(f"Termo de pesquisa: {search_term}")
-    celular = Celular.objects.filter(nome__icontains=search_term)
-    return render(request, 'index.html', {'celular': celular, 'search_term': search_term})
+    celulares = Celular.objects.filter(nome__icontains=search_term)
+    if celulares.count() == 1:
+        return redirect('detalhes', celular_id=celulares.first().id)
+
+    return render(request, 'index.html', {'celulares': celulares, 'search_term': search_term})
